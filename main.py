@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(assets_folder, "Wizard_0.png")).convert()
+        self.image = pygame.image.load(os.path.join(assets_folder, "Player.png")).convert()
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.speedx = 0
