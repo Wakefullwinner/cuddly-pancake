@@ -2,71 +2,63 @@ import pygame
 from settings import *
 from sprites import *
 from map import *
+from os import path
+import sys
 pygame.init()
 
-game_folder = os.path.dirname(__file__)
-assets_folder = os.path.join(game_folder, "Sprites")
+class Spil:
 
-class Player(pygame.sprite.Sprite):
-    # Player sprite
+    def init(self):
+        pygame.init()
+        self.screen = pygame.display.set((WIDTH,HEIGHT))
+        pygame.display.set_caption(TITLE)
+        self.clock = pygame.time.Clock()
+        self.load_data()
 
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(assets_folder, "Player.png")).convert()
-        self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.speedx = 0
-        self.speedy = 0
+    def load_assets(self):
+        game_folder = os.path.dirname(__file__)
+        assets_folder = os.path.join(game_folder, "Sprites")
+        self.map = Map(path.join(game_folder, 'map1.txt'))
+        self.player_img = pygame.image.load(path.join(assets_folder, PLAYER_IMG ))
+
+
+
+    def new(self):
+        self.all_sprites = pygame.sprite.Group()
+        self.walls = pygame.sprite.Group()
+        for row, tiles in enumerate(self.map.data):
+            for col, tile in enumerate(tiles):
+                if tile == '1':
+                    Wall(self, col, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
+        player = Player()
+        all_sprites.add(player)
+
+    def run(self):
+        # game loop - set self.playing = False to end the game
+        self.playing = True
+        while self.playing:
+            self.dt = self.clock.tick(FPS) / 1000.0
+            self.events()
+            self.update()
+            self.draw()
+
+    def quit(self):
+        pg.quit()
+        sys.exit()
 
     def update(self):
-        self.speedx = 0
-        keystate = pygame.key.get_pressed()
-        # Moves player left and right
-        if keystate[pygame.K_a]:
-            self.speedx = -5
-        if keystate[pygame.K_d]:
-            self.speedx = 5
-        self.rect.x += self.speedx
-        # Moves Player up and down
-        self.speedy = 0
-        keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_w]:
-            self.speedy = -5
-        if keystate[pygame.K_s]:
-            self.speedy = 5
-        self.rect.y += self.speedy
+        # update portion of the game loop
+        self.all_sprites.update()
+        self.camera.update(self.player)
 
-        # Keeps Player on screen
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
+    def draw_grid(self):
+        for x in range(0, WIDTH, TILESIZE):
+            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
+        for y in range(0, HEIGHT, TILESIZE):
+            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
 
-
-class Mob(pygame.sprite.Sprite):
-
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.surface((40, 40))
-        self.image.fill(RED)
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(WIDTH - self.rect.width)
-        self.rect.y = random.randrange(HEIGHT)
-
-
-# Initialize Pygame and create window
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Realm Arena")
-clock = pygame.time.Clock()
-
-all_sprites = pygame.sprite.Group()
-player = Player()
-all_sprites.add(player)
 # Game Loop
 
 finished = False

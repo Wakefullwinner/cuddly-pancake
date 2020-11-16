@@ -7,7 +7,15 @@ TILESIZE = 32 # How large each cube/tile is
 GRIDWIDTH = WIDTH/TILESIZE
 GRIDWIDTH = HEIGHT/TILESIZE
 FPS = 60
+TITLE = 'Realm Arena'
 
 #COLOR
 BLACK = (0,0,0)
 WHITE = (255, 255, 255)
+
+
+
+#PLAYER
+PLAYER_SPEED = 150
+PLAYER_IMG = 'Player.png'
+PLAYER_HIT_RECT = pygame.Rect(0,0,50,50)
