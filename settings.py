@@ -16,6 +16,5 @@ WHITE = (255, 255, 255)
 
 
 #PLAYER
-PLAYER_SPEED = 150
 PLAYER_IMG = 'Player.png'
 PLAYER_HIT_RECT = pygame.Rect(0,0,50,50)

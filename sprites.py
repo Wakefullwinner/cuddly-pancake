@@ -1,7 +1,7 @@
 import pygame
 from settings import *
 from map import *
-
+import math
 
 class Player(pygame.sprite.Sprite):
     # Player sprite
@@ -11,26 +11,26 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.join(assets_folder, "Player.png")).convert()
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.speedx = 0
-        self.speedy = 0
+        self.pSpeedx = 0
+        self.pSpeedy = 0
 
-    def update(self):
-        self.speedx = 0
+    def update(self, player):
+        self.pSpeedx = 0
         keystate = pygame.key.get_pressed()
         # Moves player left and right
         if keystate[pygame.K_a]:
-            self.speedx = -5
+            self.pSpeedx = -5
         if keystate[pygame.K_d]:
-            self.speedx = 5
-        self.rect.x += self.speedx
+            self.pSpeedx = 5
+        self.rect.x += self.pSpeedx
         # Moves Player up and down
-        self.speedy = 0
+        self.pSpeedy = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_w]:
-            self.speedy = -5
+            self.pSpeedy = -5
         if keystate[pygame.K_s]:
-            self.speedy = 5
-        self.rect.y += self.speedy
+            self.pSpeedy = 5
+        self.rect.y += self.pSpeedy
 
         # Keeps Player on screen
         if self.rect.right > WIDTH:
@@ -52,3 +52,13 @@ class Mob(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(HEIGHT)
+        self.mSpeedx = 0
+        self.mSpeedy = 0
+
+    def move_to_player(self, player):
+        self.speed = 5
+        movevect = pygame.math.Vector2(player.rect.x - self.rect.x,
+                                       player.rect.y - self.rect.y)
+        movevect.normalize()
+        movevect.scale_to_length(self.speed)
+        self.rect.move_ip(movevect)
