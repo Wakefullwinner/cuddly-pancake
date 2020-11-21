@@ -7,40 +7,76 @@ class Player(pygame.sprite.Sprite):
     # Player sprite
 
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(assets_folder, "Player.png")).convert()
+        self.groups = game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.player_img
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.pSpeedx = 0
-        self.pSpeedy = 0
+        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect.center = self.rect.center
+        self.vel = vec(0, 0)
+        self.pos = vec(x, y) * TILESIZE
+        self.original_image = self.image
 
-    def update(self, player):
-        self.pSpeedx = 0
-        keystate = pygame.key.get_pressed()
-        # Moves player left and right
-        if keystate[pygame.K_a]:
-            self.pSpeedx = -5
-        if keystate[pygame.K_d]:
-            self.pSpeedx = 5
-        self.rect.x += self.pSpeedx
-        # Moves Player up and down
-        self.pSpeedy = 0
-        keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_w]:
-            self.pSpeedy = -5
-        if keystate[pygame.K_s]:
-            self.pSpeedy = 5
-        self.rect.y += self.pSpeedy
 
-        # Keeps Player on screen
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
+    def get_keys(self):
+        self.vel = vec(0,0)
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            self.vel.x = -PLAYER_SPEED
+        if keys[pygame.K_d]:
+            self.vel.x = PLAYER_SPEED
+        if keys[pygame.K_w]:
+            self.vel.y = -PLAYER_SPEED
+        if keys[pygame.K_s]:
+           self.vel.y = PLAYER_SPEED
+   #     if self.vel.x != 0 and self.vel.y != 0:
+   #         self.vel *= 0.7071
+
+
+    def rotate(self):
+        # The vector to the target (the mouse position).
+        direction = pygame.mouse.get_pos() - self.pos
+        # .as_polar gives you the polar coordinates of the vector,
+        # i.e. the radius (distance to the target) and the angle.
+        radius, angle = direction.as_polar()
+        # Rotate the image by the negative angle (y-axis in pygame is flipped).
+        self.image = pygame.transform.rotate(self.original_image, -angle)
+        # Create a new rect with the center of the old rect.
+        self.rect = self.image.get_rect(center=self.rect.center)
+ 
+    def collide_with_walls(self, dir):
+        if dir == 'x':
+            hits = pygame.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vel.x > 0:
+                    self.pos.x = hits[0].rect.left - self.hit_rect.width / 2.0
+                if self.vel.x < 0:
+                    self.pos.x = hits[0].rect.right + self.hit_rect.width / 2.0
+                self.vel.x = 0
+                self.hit_rect.centerx = self.pos.x
+        if dir == 'y':
+            hits = pygame.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vel.y > 0:
+                    self.pos.y = hits[0].rect.top - self.hit_rect.height / 2.0
+                if self.vel.y < 0:
+                    self.pos.y = hits[0].rect.bottom + self.hit_rect.height / 2.0
+                self.vel.y = 0
+                self.hit_rect.centery = self.pos.y
+
+
+    def update(self):
+        self.rotate()
+        self.get_keys()
+        self.rect = self.image.get_rect()
+        self.pos += self.vel * self.game.dt
+        self.rect.center = self.pos
+        self.hit_rect.centerx = self.pos.x
+        self.collide_with_walls('x')
+        self.hit_rect.centery = self.pos.y
+        self.collide_with_walls('y')
+        self.rect.center = self.hit_rect.center
 
 
 class Mob(pygame.sprite.Sprite):
