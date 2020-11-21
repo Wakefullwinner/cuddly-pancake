@@ -6,7 +6,7 @@ from os import path
 import sys
 pygame.init()
 
-class Spil:
+class Game:
 
     def init(self):
         pygame.init()
@@ -19,14 +19,15 @@ class Spil:
         game_folder = os.path.dirname(__file__)
         assets_folder = os.path.join(game_folder, "Sprites")
         self.map = Map(path.join(game_folder, 'map1.txt'))
-        self.player_img = pygame.image.load(path.join(assets_folder, PLAYER_IMG ))
-
+        self.player_img = pygame.image.load(path.join(assets_folder, PLAYER_IMG )).convert_alpha()
+        self.wall_img = pg.image.load(path.join(img_folder, WALL_IMG )).convert_alpha()
 
 
     def new(self):
+        #Initialize variables and setup new game
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
-        for row, tiles in enumerate(self.map.data):
+        for row, tiles in enumerate(self.map.data): #Enumerate gives both index and the value in a given list or in this case a text file
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Wall(self, col, row)
@@ -36,28 +37,20 @@ class Spil:
         all_sprites.add(player)
 
     def run(self):
-        # game loop - set self.playing = False to end the game
-        self.playing = True
+        self.finished = True
         while self.playing:
-            self.dt = self.clock.tick(FPS) / 1000.0
+            self.time = self.clock.tick(FPS) / 500
             self.events()
             self.update()
             self.draw()
 
     def quit(self):
-        pg.quit()
+        pygame.quit()
         sys.exit()
 
     def update(self):
         # update portion of the game loop
         self.all_sprites.update()
-        self.camera.update(self.player)
-
-    def draw_grid(self):
-        for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
-        for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
 
 # Game Loop
 
