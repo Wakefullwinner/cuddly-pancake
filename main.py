@@ -20,7 +20,7 @@ class Game:
         assets_folder = os.path.join(game_folder, "Sprites")
         self.map = Map(path.join(game_folder, 'map1.txt'))
         self.player_img = pygame.image.load(path.join(assets_folder, PLAYER_IMG )).convert_alpha()
-        self.wall_img = pg.image.load(path.join(img_folder, WALL_IMG )).convert_alpha()
+        self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG )).convert_alpha()
 
 
     def new(self):
@@ -37,7 +37,7 @@ class Game:
         all_sprites.add(player)
 
     def run(self):
-        self.finished = True
+        self.playing = True
         while self.playing:
             self.time = self.clock.tick(FPS) / 500
             self.events()
@@ -51,6 +51,11 @@ class Game:
     def update(self):
         # update portion of the game loop
         self.all_sprites.update()
+        
+     def draw(self):
+        self.screen.fill(BLACK)
+        self.all_sprites.draw(self.screen)
+        pygame.display.flip()
 
 # Game Loop
 
