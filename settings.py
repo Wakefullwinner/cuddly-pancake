@@ -1,5 +1,5 @@
+import pygame
 #SETTINGS
-
 
 HEIGHT = 768
 WIDTH = 1024
@@ -12,7 +12,7 @@ TITLE = 'Realm Arena'
 #COLOR
 BLACK = (0,0,0)
 WHITE = (255, 255, 255)
-
+BG = WHITE
 
 
 #PLAYER
